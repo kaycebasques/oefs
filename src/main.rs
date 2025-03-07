@@ -1,22 +1,39 @@
-use clap::Parser;
+use std::path::PathBuf;
 
-/// Simple program to greet a person
-#[derive(Parser, Debug)]
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
 #[command(version, about, long_about = None)]
-struct Args {
-    /// Name of the person to greet
-    #[arg(short, long)]
-    name: String,
+struct Cli {
+    name: Option<String>,
 
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+    #[arg(short, long, value_name = "DIR")]
+    dir: Option<PathBuf>,
+
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Build,
 }
 
 fn main() {
-    oefs::print_tagline();
-    let args = Args::parse();
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name);
+    let cli = Cli::parse();
+
+    if let Some(name) = cli.name.as_deref() {
+        println!("Value for name: {name}");
+    }
+
+    if let Some(dir_path) = cli.dir.as_deref() {
+        println!("Value for dir: {}", dir_path.display());
+    }
+
+    match &cli.command {
+        Some(Commands::Build) => {
+            println!("TODO: Build the site!");
+        }
+        None => {}
     }
 }
